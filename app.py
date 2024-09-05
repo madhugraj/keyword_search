@@ -38,15 +38,23 @@ def highlight_keywords(text, keywords):
     Only highlight whole words.
     """
     highlighted_text = text
+    keyword_found = False  # Flag to check if any keyword is found
+
     for keyword in keywords:
         # Use regex to match whole words only (case insensitive)
         pattern = rf'\b{re.escape(keyword)}\b'
-        highlighted_text = re.sub(
-            pattern,
-            f'<mark style="background-color: yellow;">{keyword}</mark>',
-            highlighted_text,
-            flags=re.IGNORECASE
-        )
+        if re.search(pattern, highlighted_text, flags=re.IGNORECASE):
+            # If a keyword is found, replace it with highlighted text
+            highlighted_text = re.sub(
+                pattern,
+                f'<mark style="background-color: yellow;">{keyword}</mark>',
+                highlighted_text,
+                flags=re.IGNORECASE
+            )
+            keyword_found = True  # Set the flag to True if any keyword is found
+
+    if not keyword_found:
+        return "No keywords found."
     return highlighted_text
 
 def generate(user_input):
@@ -80,7 +88,7 @@ Sentence: {user_input}"""
     return output
 
 # Streamlit App Layout
-st.title("Keyword Highlighter with Generative AI")
+st.title("Keyword Highlighter")
 
 # Input from the user with a unique key
 user_input = st.text_area("Enter a sentence to check for keywords:", key="unique_text_area_key")
@@ -93,7 +101,7 @@ if st.button("Generate"):
         # Highlight the keywords in the user's input
         highlighted_input = highlight_keywords(user_input, all_keywords)
 
-        # Display the output with highlighted keywords
+        # Display the output with highlighted keywords or "No keywords found"
         st.markdown("### Output with Highlighted Keywords")
         st.markdown(highlighted_input, unsafe_allow_html=True)
         
