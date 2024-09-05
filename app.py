@@ -2,9 +2,9 @@ import os
 import streamlit as st
 import google.generativeai as genai
 
-# Configure the API key
-GOOGLE_API_KEY = "AIzaSyAe8rheF4wv2ZHJB2YboUhyyVlM2y0vmlk"  
-genai.configure(api_key=GOOGLE_API_KEY)
+# Retrieve the API key from secrets
+api_key = st.secrets["api_key"]
+genai.configure(api_key=api_key)
 
 # Configuration for generation
 generation_config = {
@@ -16,7 +16,7 @@ generation_config = {
 }
 
 # List of keywords for checking
-keywords = [
+obgyn_keywords = [
     "BOTOX", "Nexplanon", "Nexplanon removal", "Nexplanon sp", "SIS KL", "SIS",
     "Nexplanon insertion", "Nexplanon insert", "Botox `100U", "IUD", "Ultrasound",
     "bedside", "Fluoroscopy", "ASCUS", "Nuchal", "HPV", "skin tag removal",
@@ -24,13 +24,21 @@ keywords = [
     "ROB", "Pessary", "Neplanon"
 ]
 
+cardiology_keywords = [
+    "Plain Treadmill", "Carotid Doppler", "Submax stress", "Exnuke", "Nuc",
+    "Lexi", "Echo", "Stress Echo", "RTM", "ETT"
+]
+
+# Combine both lists into one
+all_keywords = obgyn_keywords + cardiology_keywords
+
 def highlight_keywords(text, keywords):
     """
-    Highlight keywords in the text by wrapping them in HTML <u> tags.
+    Highlight keywords in the text by wrapping them in HTML <mark> tags with yellow background.
     """
     for keyword in keywords:
         if keyword.lower() in text.lower():
-            text = text.replace(keyword, f'<u>{keyword}</u>')
+            text = text.replace(keyword, f'<mark style="background-color: yellow;">{keyword}</mark>')
     return text
 
 def generate(user_input):
@@ -42,10 +50,11 @@ def generate(user_input):
 
     # Combine keywords and user input in the prompt
     prompt_text = f"""Given a set of keywords:
-OBGYN Keywords: {', '.join(keywords)}
+OBGYN Keywords: {', '.join(obgyn_keywords)}
+Cardiology Keywords: {', '.join(cardiology_keywords)}
 
 Find if any of the above keywords are present in the following sentence:
-If yes, show the sentence and underline all the keywords. Do not highlight non-keywords.
+If yes, show the sentence and highlight all the keywords in yellow. Do not highlight non-keywords.
 
 Sentence: {user_input}"""
 
@@ -74,7 +83,7 @@ if st.button("Generate"):
         output = generate(user_input)
 
         # Highlight the keywords in the output
-        highlighted_output = highlight_keywords(output, keywords)
+        highlighted_output = highlight_keywords(output, all_keywords)
 
         # Display the output with highlighted keywords
         st.markdown("### Output with Highlighted Keywords")
