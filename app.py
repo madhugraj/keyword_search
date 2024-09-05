@@ -33,7 +33,7 @@ all_keywords = obgyn_keywords + cardiology_keywords
 
 def highlight_keywords(text, keywords):
     """
-    Highlight keywords in the text by wrapping them in HTML <mark> tags with yellow background as per the instruction below:Find if any of the following keywords are present as whole words in the given sentence. If yes, show the sentence and mention the found keywords. For example if ett is the keyword, we should not highlight ett in getting, but ett should be highlighted in ett tested. 
+    Highlight keywords in the text by wrapping them in HTML <mark> tags with yellow background.  
     """
     # Ensure the keywords are highlighted correctly by checking for word boundaries
     highlighted_text = text
@@ -74,8 +74,7 @@ def generate(user_input):
 OBGYN Keywords: {', '.join(obgyn_keywords)}
 Cardiology Keywords: {', '.join(cardiology_keywords)}
 
-Find if any of the above keywords are present in the following sentence:
-If yes, show the sentence and mention the found keywords.
+Find if any of the following keywords are present as whole words in the given sentence. If yes, show the sentence and mention the found keywords.
 
 Sentence: {user_input}"""
 
