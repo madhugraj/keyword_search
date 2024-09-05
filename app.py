@@ -33,7 +33,7 @@ all_keywords = obgyn_keywords + cardiology_keywords
 
 def highlight_keywords(text, keywords):
     """
-    Highlight keywords in the text by wrapping them in HTML <mark> tags with yellow background.
+    Highlight keywords in the text by wrapping them in HTML <mark> tags with yellow background.The keywords should be exactly mapped. For example if ett is the keyword, we should not highlight ett in getting, but ett should be highlighted in ett tested. 
     """
     # Ensure the keywords are highlighted correctly by checking for word boundaries
     highlighted_text = text
