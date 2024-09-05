@@ -74,7 +74,8 @@ def generate(user_input):
 OBGYN Keywords: {', '.join(obgyn_keywords)}
 Cardiology Keywords: {', '.join(cardiology_keywords)}
 
-Find if any of the following keywords are present as whole words in the given sentence. If yes, show the sentence and mention the found keywords.
+Find if any of the keywords are present in the input sentence : 
+If yes show the sentence. Do not highlight the non keyword. Remember the keyword should be whole word.
 
 Sentence: {user_input}"""
 
