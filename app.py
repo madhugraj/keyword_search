@@ -1,6 +1,7 @@
 import os
 import streamlit as st
 import google.generativeai as genai
+import re
 
 # Configure the API key
 GOOGLE_API_KEY = "AIzaSyAe8rheF4wv2ZHJB2YboUhyyVlM2y0vmlk"
@@ -15,40 +16,23 @@ generation_config = {
     "response_mime_type": "text/plain",
 }
 
-# Define the keywords text
-keywords_text = """Giving you set of keywords:
-OBGYN:
- 1. BOTOX
-2. Nexplanon
-3. Nexplanon removal
-4. Nexplanon sp
-5. SIS KL
-6. SIS
-7. Nexplanon insertion
-8. Nexplanon insert
-9. Botox `100U
-10. IUD
-11. Nexplanon
-12. Botox
-13. Nexaplenon
-14. Nexplenon
-15. Ultrasound
-16. bedside
-17. Fluoroscopy
-18. ASCUS
-19. Nuchal
-20. HPV
-21. skin tag removal
-22. Paragard
-23. Paraguard
-24. Mirena
-25. Kyleena
-26 Anti Coag/Urology
-27. EDD
-28. ROB
-29. Pessary
-30. Neplanon
-"""
+# Define the keywords list
+keywords = [
+    "BOTOX", "Nexplanon", "Nexplanon removal", "Nexplanon sp", "SIS KL", "SIS", 
+    "Nexplanon insertion", "Nexplanon insert", "Botox `100U", "IUD", "Ultrasound", 
+    "bedside", "Fluoroscopy", "ASCUS", "Nuchal", "HPV", "skin tag removal", 
+    "Paragard", "Paraguard", "Mirena", "Kyleena", "Anti Coag/Urology", "EDD", 
+    "ROB", "Pessary", "Neplanon"
+]
+
+def highlight_keywords(text, keywords):
+    """
+    Highlight keywords in the text by wrapping them in HTML <u> tags.
+    """
+    for keyword in keywords:
+        # Use regex to find whole words case-insensitively
+        text = re.sub(rf'\b{re.escape(keyword)}\b', f'<u>{keyword}</u>', text, flags=re.IGNORECASE)
+    return text
 
 def generate(user_input):
     # Initialize the GenerativeModel
@@ -58,7 +42,9 @@ def generate(user_input):
     )
 
     # Combine keywords and user input in the prompt
-    prompt_text = f"""{keywords_text}
+    prompt_text = f"""Giving you a set of keywords:
+OBGYN Keywords: {', '.join(keywords)}
+
 Find if any of the above keywords are present in the following sentence:
 If yes, show the sentence and underline all the keywords. Do not highlight the non-keyword.
 
@@ -85,6 +71,9 @@ if user_input:
     # Generate the response
     output = generate(user_input)
 
-    # Highlight the keywords using Streamlit's Markdown support
+    # Highlight the keywords in the output
+    highlighted_output = highlight_keywords(output, keywords)
+    
+    # Display the output with highlighted keywords
     st.markdown("### Output with Highlighted Keywords")
-    st.markdown(output, unsafe_allow_html=True)
+    st.markdown(highlighted_output, unsafe_allow_html=True)
