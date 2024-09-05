@@ -1,5 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
+import re  # Import the regex library
 
 # Retrieve the API key from secrets
 api_key = st.secrets["api_key"]  # Ensure you've set this in Streamlit Secrets
@@ -33,33 +34,19 @@ all_keywords = obgyn_keywords + cardiology_keywords
 
 def highlight_keywords(text, keywords):
     """
-    Highlight keywords in the text by wrapping them in HTML <mark> tags with yellow background.  
+    Highlight keywords in the text by wrapping them in HTML <mark> tags with yellow background.
+    Only highlight whole words.
     """
-    # Ensure the keywords are highlighted correctly by checking for word boundaries
     highlighted_text = text
     for keyword in keywords:
-        keyword_lower = keyword.lower()
-        text_lower = highlighted_text.lower()
-        
-        # Find all occurrences of the keyword in the text (case insensitive)
-        start_idx = text_lower.find(keyword_lower)
-        while start_idx != -1:
-            # Calculate the end index of the keyword
-            end_idx = start_idx + len(keyword)
-            
-            # Highlight the keyword by wrapping it in HTML <mark> tags
-            highlighted_text = (
-                highlighted_text[:start_idx] +
-                f'<mark style="background-color: yellow;">{highlighted_text[start_idx:end_idx]}</mark>' +
-                highlighted_text[end_idx:]
-            )
-            
-            # Update text_lower to match highlighted_text for accurate search
-            text_lower = highlighted_text.lower()
-            
-            # Find the next occurrence of the keyword
-            start_idx = text_lower.find(keyword_lower, end_idx + len('<mark style="background-color: yellow;"></mark>'))
-            
+        # Use regex to match whole words only (case insensitive)
+        pattern = rf'\b{re.escape(keyword)}\b'
+        highlighted_text = re.sub(
+            pattern,
+            f'<mark style="background-color: yellow;">{keyword}</mark>',
+            highlighted_text,
+            flags=re.IGNORECASE
+        )
     return highlighted_text
 
 def generate(user_input):
@@ -111,7 +98,7 @@ if st.button("Generate"):
         st.markdown(highlighted_input, unsafe_allow_html=True)
         
         # Display the model's generated response (if needed)
-        #st.markdown("### Model's Response")
-        #st.write(generated_response)
+        # st.markdown("### Model's Response")
+        # st.write(generated_response)
     else:
         st.warning("Please enter a sentence to check for keywords.")
