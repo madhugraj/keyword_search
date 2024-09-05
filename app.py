@@ -1,11 +1,9 @@
-import os
 import streamlit as st
 import google.generativeai as genai
 
 # Retrieve the API key from secrets
-api_key = st.secrets["api_key"]
+api_key = st.secrets["api_key"]  # Ensure you've set this in Streamlit Secrets
 genai.configure(api_key=api_key)
-
 
 # Configuration for generation
 generation_config = {
@@ -37,13 +35,32 @@ def highlight_keywords(text, keywords):
     """
     Highlight keywords in the text by wrapping them in HTML <mark> tags with yellow background.
     """
+    # Ensure the keywords are highlighted correctly by checking for word boundaries
+    highlighted_text = text
     for keyword in keywords:
-        if keyword.lower() in text.lower():
-            text = text.replace(
-                keyword,
-                f'<mark style="background-color: yellow;">{keyword}</mark>'
+        keyword_lower = keyword.lower()
+        text_lower = highlighted_text.lower()
+        
+        # Find all occurrences of the keyword in the text (case insensitive)
+        start_idx = text_lower.find(keyword_lower)
+        while start_idx != -1:
+            # Calculate the end index of the keyword
+            end_idx = start_idx + len(keyword)
+            
+            # Highlight the keyword by wrapping it in HTML <mark> tags
+            highlighted_text = (
+                highlighted_text[:start_idx] +
+                f'<mark style="background-color: yellow;">{highlighted_text[start_idx:end_idx]}</mark>' +
+                highlighted_text[end_idx:]
             )
-    return text
+            
+            # Update text_lower to match highlighted_text for accurate search
+            text_lower = highlighted_text.lower()
+            
+            # Find the next occurrence of the keyword
+            start_idx = text_lower.find(keyword_lower, end_idx + len('<mark style="background-color: yellow;"></mark>'))
+            
+    return highlighted_text
 
 def generate(user_input):
     # Initialize the GenerativeModel
