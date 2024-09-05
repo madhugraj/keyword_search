@@ -111,7 +111,7 @@ if st.button("Generate"):
         st.markdown(highlighted_input, unsafe_allow_html=True)
         
         # Display the model's generated response (if needed)
-        st.markdown("### Model's Response")
-        st.write(generated_response)
+        #st.markdown("### Model's Response")
+        #st.write(generated_response)
     else:
         st.warning("Please enter a sentence to check for keywords.")
